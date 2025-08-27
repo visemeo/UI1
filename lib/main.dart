@@ -1,314 +1,381 @@
+
 import 'package:flutter/material.dart';
-import 'package:toast/toast.dart';
-import 'package:flutter_styled_toast/flutter_styled_toast.dart';
-import 'package:flashy_flushbar/flashy_flushbar.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 void main() => runApp(const MyApp());
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        textTheme: TextTheme(
-          displayLarge: TextStyle(fontSize: 57.0, fontWeight: FontWeight.normal),
-          headlineMedium: TextStyle(fontSize: 28.0, fontWeight: FontWeight.normal),
-          bodyLarge: TextStyle(fontSize: 16.0),
-          labelLarge: TextStyle(fontSize: 14.0, fontWeight: FontWeight.normal),
-        ),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
 
-      ),
+class MyApp extends StatefulWidget {
+const MyApp({super.key});
 
-      home: const MyHomePage(),
-      builder: FlashyFlushbarProvider.init(),
-    );
-  }
+@override
+State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+ThemeMode themeMode = ThemeMode.light;
+
+@override
+Widget build(BuildContext context) {
+return MaterialApp(
+title: 'Flutter Demo',
+themeMode: themeMode,
+darkTheme: ThemeData(
+brightness: Brightness.dark,
+primarySwatch: Colors.deepPurple,
+scaffoldBackgroundColor: Colors.black,
+appBarTheme: const AppBarTheme(
+backgroundColor: Colors.deepPurple,
+titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+),
+textTheme: const TextTheme(
+bodyLarge: TextStyle(color: Colors.white, fontSize: 18),
+),
+),
+theme: ThemeData(
+primaryColor: Colors.blue,
+colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurpleAccent),
+),
+home: MyHomePage(
+themeMode: themeMode,
+onThemeChanged: (mode) {
+setState(() {
+themeMode = mode;
+});
+},
+),
+);
+}
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+final ThemeMode themeMode;
+final Function(ThemeMode) onThemeChanged;
+
+const MyHomePage({
+super.key,
+required this.themeMode,
+required this.onThemeChanged,
+});
+
+@override
+State<MyHomePage> createState() => _MyHomePageState();
 }
+
 class _MyHomePageState extends State<MyHomePage> {
-  String str = 'Flutter Demo';
-  List imgList = [
-    'images/s1.jpg',
-    'images/s2.jpg',
-    'images/s3.jpg',
-  ];
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: CustomScrollView(
-          slivers: [
-            SliverAppBar(
-              expandedHeight: 100,
-              leading: Padding(
-                padding: const EdgeInsets.all(1),
-                child: Row(
-                  children: [
-                        IconButton(onPressed: (){},
-                        icon: const Icon(Icons.account_circle,size: 35,color: Colors.white,),),
-                  ],
-                ),
-              ),
-              actions: [
-                IconButton(onPressed: (){},
-                  icon: const Icon(Icons.add_card,size: 35,color: Colors.white,),)
-              ],
-              flexibleSpace:  Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors:[
-                        Colors.deepPurpleAccent,
-                        Colors.pink,
-                        Colors.deepPurpleAccent,
-                      ] ),
-                ),
-              ),
-              //backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              centerTitle: true,
-              title:  Text(str,style: TextStyle(
-                  fontSize: 25,fontWeight: FontWeight.bold,color: Colors.white
-              ),),
-            ),
-            SliverList(delegate: SliverChildListDelegate.fixed([
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Column(
-                  children: [
-                    SizedBox(height: 30,),
-                    Text('Slider 1 :Initial page index',textAlign: TextAlign.center,),
-                    CarouselSlider(
-                      options: CarouselOptions(height: 180,initialPage: 0,),
-                      items: imgList.map((imageUrl) {
-                        return Container(
-                          width: double.infinity,
-                          margin: EdgeInsets.symmetric(horizontal: 10),
-                          child: Image.asset(imageUrl, fit: BoxFit.fill,),
-                        );
-                      }).toList(),
-                    ),
-                    SizedBox(height: 10,),
+String titleText = 'Flutter Demo';
 
-                    CarouselSlider(
-                      options: CarouselOptions(height: 150.0),
-                      items: imgList.map((i) {
-                        return Builder(
-                          builder: (BuildContext context) {
-                            return Container(
-                                width: MediaQuery.of(context).size.width,
-                                margin: EdgeInsets.symmetric(horizontal: 5.0),
-                                decoration: BoxDecoration(
-                                    color: Colors.amber
-                                ),
-                              child: Image.asset(i , fit: BoxFit.fill,),
-                            );
-                          },
-                        );
-                      }).toList(),
-                    )
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Center(
-                  child: ElevatedButton(
-                      onPressed: (){
-                    buildDialog(context);
-                  },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pinkAccent, // Set your desired background color here
-                      ),
-                      child:Text('Click AlertDialog',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),) ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: ElevatedButton(
-                    onPressed: (){
-                      setState(() {
-                        str = ' ';
-                      });
-                      buildSnackbar(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purpleAccent, // Set your desired background color here
-                    ),
-                    child: Text('Click SnackBar',style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white)),),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Center(
-                  child: ElevatedButton(
-                      onPressed: (){
-                        buildFlashbar();
-                        },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pink, // Set your desired background color here
-                      ),
-                      child: Text('Click FlashBar',style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white))
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    SelectableText('Lorem ipsum dolor sit amet',showCursor: true,
-                    ),
-                    Container(
-                      width: 200,
-                      height: 40,
-                      color: Colors.lightGreenAccent,
-                      child: Text('Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),
-                      overflow: TextOverflow.clip,
-                      softWrap: false,),
-                    ),
-                    SizedBox(height: 10,),
-                    Container(
-                      width: 200,
-                      height: 40,
-                      color: Colors.lightGreenAccent,
-                      child: Text('Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),
-                          overflow: TextOverflow.ellipsis),
-                    ),
-                    SizedBox(height: 10,),
-                    Container(
-                      width: 200,
-                      height: 40,
-                      color: Colors.lightGreenAccent,
-                      child: Text('Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),
-                          overflow: TextOverflow.fade),
-                    ),
-                    SizedBox(height: 10,),
-                    Container(
-                      width: 200,
-                      height: 40,
-                      color: Colors.lightGreenAccent,
-                      child: Text('Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20,),
-                          overflow: TextOverflow.visible),
-                    ),
-                    SizedBox(height: 10,),
-                  ],
-                ),
-              ),
-            ]))
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            showToast('This is normal toast with animation',
-              context: context,
-              animation: StyledToastAnimation.scale,
-              reverseAnimation: StyledToastAnimation.fade,
-              position: StyledToastPosition(align: Alignment.bottomCenter, offset: 100.0),
-              animDuration: Duration(seconds: 1),
-              duration: Duration(seconds: 4),
-              curve: Curves.elasticOut,
-              reverseCurve: Curves.linear,
-            );
-          },
-        tooltip: 'Increment',
-        child: const Icon(Icons. add),
-      ),
-    );
+// Carousel
+int _currentIndex = 0;
+final List<String> imgList = ['images/s1.jpg', 'images/s2.jpg', 'images/s3.jpg'];
 
-  }
+// Dropdown
+String selectedLetter = 'A';
+List<String> letterList = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
-  void buildFlashbar() {
-    FlashyFlushbar
-      (
-      backgroundColor: Colors.tealAccent,
-      leadingWidget: const Icon(
-        Icons.error_outline,
-        color: Colors.black,
-        size: 24,
-      ),
-      message: 'Hello from Flashy Flushbar',
-      duration: const Duration(seconds: 3),
-      trailingWidget: IconButton(
-        icon: const Icon(
-          Icons.close,
-          color: Colors.black,
-          size: 24,
-        ),
-        onPressed: () {
-          FlashyFlushbar.cancel();
-        },
-      ),
-      isDismissible: false,
-    ).show(
-    );
-  }
+// Checkboxes
+Map<String, bool> languages = {
+"JavaScript": false,
+"Python": false,
+"C#": false,
+};
 
-  void buildSnackbar(BuildContext context) {
-                       final sBar = SnackBar(
-      action: SnackBarAction(
-        textColor: Colors.white,
-          label:"Undo!" ,
-          onPressed: (){
-            setState(() {
-              str = 'Flutter Demo';
-            });
-          }),
-        content:Text('This is snackBar text'),
-      duration: Duration(milliseconds: 3000),
-      backgroundColor: Colors.pink,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(30),
-      ),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(sBar);
-  }
+// Quiz
+int? quizAnswer;
+String quizResult = "";
 
-  void buildDialog(BuildContext context) {
-           final AlertDialog alert = AlertDialog(
-      title: Text('Alert'),
-      content: Container(
-        height: 150,
-        child: Column(
-          children: [
-            Divider(color: Colors.black,),
-            Text('Dialog text appear here you can tap anything you want'),
-            SizedBox(height: 7,),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                  onPressed: (){
-                    Navigator.of(context).pop();
-                  },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purpleAccent, // Set your desired background color here
-                ),
-                  child: Text('Close!',style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white),),),
-            ),
-          ],
-        ),
-      )
-    );
-     showDialog(context: context,barrierDismissible: false, builder: (BuildContext ctx){
-       return alert;
-     });
-  }
-  Text buildText(){
-    return Text('You have pushed the button many time:');
-  }
+// RadioListTile background
+Color? selectedColor;
+
+// Snackbar
+void buildSnackbar(BuildContext context) {
+final sBar = SnackBar(
+action: SnackBarAction(
+textColor: Colors.white,
+label: "Undo!",
+onPressed: () {
+setState(() {
+titleText = 'Flutter Demo';
+});
+},
+),
+content: const Text('This is snackBar text'),
+duration: const Duration(milliseconds: 3000),
+backgroundColor: Colors.pink,
+shape: RoundedRectangleBorder(
+borderRadius: BorderRadius.circular(30),
+),
+);
+ScaffoldMessenger.of(context).showSnackBar(sBar);
+}
+
+@override
+Widget build(BuildContext context) {
+return Scaffold(
+appBar: AppBar(
+leading: const Padding(
+padding: EdgeInsets.all(1),
+child: Icon(Icons.account_circle, size: 35, color: Colors.white),
+),
+actions: const [
+Icon(Icons.add_card, size: 35, color: Colors.white),
+],
+flexibleSpace: Container(
+decoration: const BoxDecoration(
+gradient: LinearGradient(
+colors: [
+Colors.deepPurpleAccent,
+Colors.pink,
+Colors.deepPurpleAccent,
+],
+),
+),
+),
+centerTitle: true,
+title: Text(
+titleText,
+style: const TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+),
+),
+body: ListView(
+children: [
+const SizedBox(height: 30),
+
+// Carousel
+CarouselSlider(
+options: CarouselOptions(
+height: 180.0,
+autoPlay: true,
+autoPlayInterval: const Duration(seconds: 3),
+onPageChanged: (index, _) {
+setState(() {
+_currentIndex = index;
+});
+},
+),
+items: imgList.map((i) {
+return Builder(
+builder: (BuildContext context) {
+return Container(
+width: MediaQuery.of(context).size.width,
+margin: const EdgeInsets.symmetric(horizontal: 5.0),
+child: Image.asset(i, fit: BoxFit.fill),
+);
+},
+);
+}).toList(),
+),
+const SizedBox(height: 10),
+
+// Carousel indicators
+Row(
+mainAxisAlignment: MainAxisAlignment.center,
+children: imgList.asMap().entries.map((entry) {
+return Container(
+width: 10.0,
+height: 10.0,
+margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+decoration: BoxDecoration(
+shape: BoxShape.circle,
+color: _currentIndex == entry.key ? Colors.blue : Colors.grey,
+),
+);
+}).toList(),
+),
+const SizedBox(height: 20),
+
+// ExpansionTile
+ListView(
+shrinkWrap: true,
+physics: const NeverScrollableScrollPhysics(),
+children: [
+ExpansionTile(
+  backgroundColor: Colors.lightBlueAccent,
+  leading: Icon(Icons.perm_identity),
+title: const Text('Account', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+children: [
+const Divider(color: Colors.grey),
+Card(
+  color: Colors.cyanAccent,
+  child: ListTile(
+    leading: Icon(Icons.account_circle),
+    trailing:Icon(Icons.arrow_drop_down) ,
+  title: const Text('Sign up', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+  subtitle: const Text('Where you can sign up from'),
+  onTap: () {
+  setState(() {
+  titleText = 'Sign up';
+  buildSnackbar(context);
+  });
+  },
+  ),
+),
+  Card(
+    color: Colors.cyanAccent,
+    child: ListTile(
+      leading: Icon(Icons.add),
+      trailing:Icon(Icons.arrow_drop_down) ,
+      title: const Text('Sign in', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      subtitle: const Text('Where you can sign in from'),
+      onTap: () {
+        setState(() {
+          titleText = 'Sign in';
+          buildSnackbar(context);
+        });
+      },
+    ),
+  ),
+],
+)
+],
+),
+
+const SizedBox(height: 20),
+
+// Dropdown
+Row(
+mainAxisAlignment: MainAxisAlignment.center,
+children: [
+const Text('Select A Letter', style: TextStyle(fontSize: 25)),
+const SizedBox(width: 10),
+DropdownButton<String>(
+value: selectedLetter,
+items: letterList.map((String letter) {
+return DropdownMenuItem<String>(
+value: letter,
+child: Text(letter),
+);
+}).toList(),
+onChanged: (newVal) {
+setState(() => selectedLetter = newVal!);
+},
+),
+],
+),
+
+const SizedBox(height: 20),
+
+// Theme switch
+Row(
+mainAxisAlignment: MainAxisAlignment.center,
+children: [
+  const Text("Light Mode",style: TextStyle(fontSize: 20),),
+Switch(
+value: widget.themeMode == ThemeMode.dark,
+onChanged: (val) {
+widget.onThemeChanged(val ? ThemeMode.dark : ThemeMode.light);
+},
+),
+  const Text("Dark Mode",style: TextStyle(fontSize: 20),),
+],
+),
+
+const SizedBox(height: 20),
+
+// Checkboxes
+Column(
+children: languages.keys.map((String key) {
+return CheckboxListTile(
+title: Text(key),
+value: languages[key],
+onChanged: (bool? value) {
+setState(() {
+languages[key] = value ?? false;
+});
+},
+);
+}).toList(),
+),
+ElevatedButton(
+onPressed: () {
+var selectedLanguages =
+languages.entries.where((e) => e.value).map((e) => e.key).join(", ");
+showDialog(
+context: context,
+builder: (_) => AlertDialog(
+title: const Text("Selected Languages"),
+content: Text(selectedLanguages.isNotEmpty ? selectedLanguages : "None"),
+),
+);
+},
+child: const Text("Apply"),
+),
+
+const SizedBox(height: 20),
+
+// Quiz
+Column(
+children: [
+const Text("Quiz: 2 + 2 = ?", style: TextStyle(fontSize: 18)),
+RadioListTile<int>(
+title: const Text("3"),
+value: 3,
+groupValue: quizAnswer,
+onChanged: (val) {
+setState(() {
+quizAnswer = val;
+quizResult = "Wrong answer";
+});
+},
+),
+RadioListTile<int>(
+title: const Text("4"),
+value: 4,
+groupValue: quizAnswer,
+onChanged: (val) {
+setState(() {
+quizAnswer = val;
+quizResult = "Correct answer";
+});
+},
+),
+Text(
+quizResult,
+style: TextStyle(
+fontSize: 18,
+color: quizResult == "Correct answer" ? Colors.green : Colors.red,
+),
+),
+],
+),
+
+const SizedBox(height: 20),
+
+// RadioListTiles for background color
+Column(
+children: [
+RadioListTile<Color>(
+title: const Text("Teal"),
+value: Colors.teal,
+groupValue: selectedColor,
+onChanged: (val) {
+setState(() {
+selectedColor = val;
+});
+},
+),
+RadioListTile<Color>(
+title: const Text("Brown"),
+value: Colors.brown,
+groupValue: selectedColor,
+onChanged: (val) {
+setState(() {
+selectedColor = val;
+});
+},
+),
+Container(
+height: 100,
+width: double.infinity,
+color: selectedColor ?? Colors.grey,
+child: const Center(
+child: Text("Background Preview"),
+),
+),
+],
+),
+],
+),
+);
+}
 }
 
