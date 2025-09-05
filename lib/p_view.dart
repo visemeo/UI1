@@ -54,7 +54,7 @@ class _PViewState extends State<PView> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 6), (timer) {
       if (_currentIndex < myData.length - 1) {
         _currentIndex++;
       } else {
@@ -62,7 +62,7 @@ class _PViewState extends State<PView> {
       }
       _controller.animateToPage(
         _currentIndex,
-        duration: const Duration(seconds: 1),
+        duration: const Duration(seconds: 6),
         curve: Curves.easeInOut,
       );
     });
@@ -122,13 +122,23 @@ class _PViewState extends State<PView> {
                 ),
               )
                   .toList(),
-              onPageChanged: (val){
+              onPageChanged: (val) {
                 setState(() {
                   _currentIndex = val;
-                  if(_currentIndex == 2) {
-                    Future . delayed(Duration(seconds: 1),() =>Navigator.of(ctx).pushNamed('/main') );}
+                  if (_currentIndex == myData.length - 1) {
+                    // Stop timer so it doesn’t keep sliding
+                    _timer.cancel();
+
+                    // Navigate after 6s
+                    Future.delayed(const Duration(seconds: 6), () {
+                      if (mounted) {
+                        Navigator.of(ctx).pushReplacementNamed('/main');
+                      }
+                    });
+                  }
                 });
               },
+
             ), ),
             Align(
               alignment: const Alignment(0, 0.75),
@@ -171,22 +181,27 @@ class Indicator extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        buildIndicator(index == 0 ?Colors.green: Colors.redAccent),
-        buildIndicator(index == 1 ?Colors.green: Colors.redAccent),
-        buildIndicator(index == 2 ?Colors.green: Colors.redAccent),
+        buildIndicator(0,index == 0 ?Colors.black: Colors.redAccent),
+        buildIndicator(1,index == 1 ?Colors.black: Colors.redAccent),
+        buildIndicator(2,index == 2 ?Colors.black: Colors.redAccent),
       ],
     );
   }
 
-  Container buildIndicator(Color color) {
-    return Container(
-      margin: const EdgeInsets.all(4),
-      width: 15,
-      height: 15,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-      ),
-    );
+  Widget buildIndicator(int i, Color color) {
+    if (index == i) {
+      return Icon(Icons.star, color: color, size: 22); // active
+    } else {
+      return Container(
+        margin: const EdgeInsets.all(4),
+        width: 15,
+        height: 15,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+        ),
+      );
+    }
   }
+
 }
