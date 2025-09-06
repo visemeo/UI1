@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:ui/P_view.dart';
-import 'main_splash_screen.dart';// keep this if you plan to use PView somewhere
+import 'package:shared_preferences/shared_preferences.dart';
+Future<void> main() async {
 
-void main() => runApp(const PView());
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final bool? repeat = prefs.getBool('repeat');
+  Widget _screen = (repeat==false || repeat==null)?const PView():const MyHomePage();
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: _screen,
+    ),
+  );
+
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key}); // added const constructor
