@@ -1,9 +1,11 @@
 
 import 'dart:async';
-
+import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:ui/main.dart';
 import 'main_splash_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class Data {
   final String title;
@@ -141,8 +143,24 @@ class _PViewState extends State<PView> {
 
             ), ),
             Align(
-              alignment: const Alignment(0, 0.75),
-              child:Indicator(_currentIndex),
+                alignment: const Alignment(0, 0.7),
+             // child:Indicator(_currentIndex),
+              child: PageViewDotIndicator(
+                  currentItem: _currentIndex,
+                  count: myData.length,
+                  unselectedColor: Colors.black26,
+                  selectedColor: Colors.blue,
+                  size: const Size(16, 12),
+                  unselectedSize: const Size(12, 8),
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: EdgeInsets.zero,
+                  alignment: Alignment.center,
+                  fadeEdges: false,
+                  boxShape: BoxShape.rectangle, //defaults to circle
+                  borderRadius: BorderRadius.circular(5), //only for rectangle shape
+
+              )
             ),
             Builder(
               builder:(ctx) => Align(
@@ -151,8 +169,10 @@ class _PViewState extends State<PView> {
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(horizontal: 10),
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(ctx).pushNamed('/main'); // ✅ fixed
+                    onPressed: () async {
+                      Navigator.of(ctx).pushNamed('/main');// ✅ fixed
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool('repeat', true);
                     },
                     child: const Text(
                       'GET STARTED',
@@ -172,36 +192,3 @@ class _PViewState extends State<PView> {
   }
 }
 
-class Indicator extends StatelessWidget {
-  final int index;
-  const Indicator(this.index);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        buildIndicator(0,index == 0 ?Colors.black: Colors.redAccent),
-        buildIndicator(1,index == 1 ?Colors.black: Colors.redAccent),
-        buildIndicator(2,index == 2 ?Colors.black: Colors.redAccent),
-      ],
-    );
-  }
-
-  Widget buildIndicator(int i, Color color) {
-    if (index == i) {
-      return Icon(Icons.star, color: color, size: 22); // active
-    } else {
-      return Container(
-        margin: const EdgeInsets.all(4),
-        width: 15,
-        height: 15,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-        ),
-      );
-    }
-  }
-
-}
